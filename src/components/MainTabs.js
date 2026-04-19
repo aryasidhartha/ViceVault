@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../screens/HomeScreen';
 import SquadScreen from '../screens/SquadScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import BrainFactsScreen from '../screens/BrainFactsScreen';
 import { COLORS, FONTS } from '../utils/theme';
 
 const Tab = createBottomTabNavigator();
@@ -11,6 +12,7 @@ const Tab = createBottomTabNavigator();
 const TABS = [
   { name: 'HomeTab', label: 'HOME', component: HomeScreen },
   { name: 'SquadTab', label: 'SQUAD', component: SquadScreen },
+  { name: 'LabTab', label: 'LAB', component: BrainFactsScreen },
   { name: 'ProfileTab', label: 'PROFILE', component: ProfileScreen },
 ];
 

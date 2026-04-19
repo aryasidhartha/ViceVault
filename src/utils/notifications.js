@@ -1,5 +1,6 @@
 import * as Notifications from 'expo-notifications';
-import { getVillainById } from '../data/villains';np
+import { getVillainById } from '../data/villains';
+import { getProfile, getVillainStates } from './db';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -9,17 +10,37 @@ Notifications.setNotificationHandler({
   }),
 });
 
+// Register interactive notification categories
+Notifications.setNotificationCategoryAsync('daily_checkin', [
+  {
+    identifier: 'action_win',
+    buttonTitle: 'I Survived! 🛡️',
+    options: { opensAppToForeground: true },
+  },
+  {
+    identifier: 'action_lose',
+    buttonTitle: 'I Gave In 😔',
+    options: { opensAppToForeground: true, isDestructive: true },
+  },
+]);
+
 export async function requestNotificationPermission() {
   const { status } = await Notifications.requestPermissionsAsync();
   return status === 'granted';
 }
 
-export async function scheduleDailyReminder(hour = 21, minute = 0) {
+export async function scheduleDailyReminder(userId, hour = 21, minute = 0) {
   await Notifications.cancelAllScheduledNotificationsAsync();
 
-  const selectedIds = await getSelectedVillains();
-  const villainStates = await getVillainStates();
-  const streak = await getStreak();
+  if (!userId) return;
+
+  const [{ data: activeVillains }, { data: profile }] = await Promise.all([
+    getVillainStates(userId),
+    getProfile(userId),
+  ]);
+
+  const selectedIds = (activeVillains || []).map(state => state.villain_id);
+  const streak = { count: profile?.streak_count || 0 };
 
   if (selectedIds.length === 0) return;
 
@@ -27,7 +48,6 @@ export async function scheduleDailyReminder(hour = 21, minute = 0) {
   const villain = getVillainById(villainId);
   if (!villain) return;
 
-  const state = villainStates[villainId] || { hp: villain.defaultHP };
   const missedDays = streak.count === 0 ? 2 : 0;
 
   let taunt;
@@ -44,6 +64,7 @@ export async function scheduleDailyReminder(hour = 21, minute = 0) {
       title: villain.name,
       body: taunt,
       data: { villainId },
+      categoryIdentifier: 'daily_checkin',
     },
     trigger: {
       hour,

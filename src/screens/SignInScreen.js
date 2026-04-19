@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { COLORS, FONTS } from '../utils/theme';
 import { PrimaryButton, GhostButton } from '../components/UIComponents';
-import { signIn } from '../utils/supabase';
+import { signInWithEmail } from '../utils/supabase';
 
 export default function SignInScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -13,12 +13,27 @@ export default function SignInScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
 
   async function handleSignIn() {
-    if (!email || !password) return;
+    const cleanEmail = String(email || '').trim().toLowerCase();
+    if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      Alert.alert('Invalid email', 'Enter a valid email address.');
+      return;
+    }
+    if (!password) {
+      Alert.alert('Missing password', 'Enter your password.');
+      return;
+    }
     setLoading(true);
-    const { error } = await signIn(email.trim().toLowerCase(), password);
+    const { data, error } = await signInWithEmail(cleanEmail, password);
     setLoading(false);
-    if (error) Alert.alert('Sign in failed', error.message);
-    // On success, AuthContext detects the session and App.js navigates automatically
+    if (error) {
+      console.error('Sign in failed', error);
+      Alert.alert('Sign in failed', error.message || 'Network request failed');
+      return;
+    }
+    if (!data?.user) {
+      Alert.alert('Check your email', 'A confirmation email has been sent. Confirm your account and sign in again.');
+      return;
+    }
   }
 
   return (
@@ -32,25 +47,26 @@ export default function SignInScreen({ navigation }) {
           </View>
 
           <View style={styles.form}>
-            <Text style={styles.label}>EMAIL</Text>
+            <Text style={styles.label}>EMAIL ADDRESS</Text>
             <TextInput
               style={styles.input}
               value={email}
               onChangeText={setEmail}
-              placeholder="you@example.com"
+              placeholder="you@domain.com"
               placeholderTextColor={COLORS.textGhost}
-              keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
+              keyboardType="email-address"
             />
-
             <Text style={styles.label}>PASSWORD</Text>
             <TextInput
               style={styles.input}
               value={password}
               onChangeText={setPassword}
-              placeholder="Your password"
+              placeholder="Enter your password"
               placeholderTextColor={COLORS.textGhost}
+              autoCapitalize="none"
+              autoCorrect={false}
               secureTextEntry
             />
 

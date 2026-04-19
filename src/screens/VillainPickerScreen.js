@@ -6,7 +6,7 @@ import {
 import { COLORS, FONTS } from '../utils/theme';
 import { PrimaryButton } from '../components/UIComponents';
 import { VILLAINS } from '../data/villains';
-import { activateVillains, updateProfile } from '../utils/db';
+import { activateVillains } from '../utils/db';
 import { useAuth } from '../hooks/useAuth';
 import { scheduleDailyReminder, requestNotificationPermission } from '../utils/notifications';
 
@@ -14,6 +14,7 @@ export default function VillainPickerScreen({ navigation, route }) {
   const { user, refreshProfile } = useAuth();
   const fromSuggestion = route?.params?.fromSuggestion;
   const [selected, setSelected] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
 
   function toggle(id) {
     setSelected(prev =>
@@ -22,14 +23,26 @@ export default function VillainPickerScreen({ navigation, route }) {
   }
 
   async function confirm() {
-    if (selected.length === 0) return;
+    if (selected.length === 0 || !user || submitting) return;
+
+    setSubmitting(true);
     const { error } = await activateVillains(user.id, selected);
-    if (error) { Alert.alert('Error', error.message); return; }
-    await updateProfile(user.id, { onboarded: true });
-    const granted = await requestNotificationPermission();
-    if (granted) await scheduleDailyReminder(21, 0);
+    if (error) {
+      setSubmitting(false);
+      Alert.alert('Error', error.message);
+      return;
+    }
+
+    try {
+      const granted = await requestNotificationPermission();
+      if (granted) await scheduleDailyReminder(user.id, 21, 0);
+    } catch (notificationError) {
+      console.warn('Failed to set reminder', notificationError);
+    }
+
     await refreshProfile();
     navigation.replace('Main');
+    setSubmitting(false);
   }
 
   return (

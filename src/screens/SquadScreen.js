@@ -3,11 +3,11 @@ import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView } fr
 import { useFocusEffect } from '@react-navigation/native';
 import { COLORS, FONTS } from '../utils/theme';
 import { VillainHPBar, HeroPowerBar } from '../components/UIComponents';
-import { VILLAINS, getVillainById } from '../data/villains';
+import { getVillainById } from '../data/villains';
 import { getVillainStates } from '../utils/db';
 import { useAuth } from '../hooks/useAuth';
 
-export default function SquadScreen() {
+export default function SquadScreen({ navigation }) {
   const { user } = useAuth();
   const [tab, setTab] = useState('villains');
   const [villainStates, setVillainStates] = useState([]);
@@ -39,9 +39,15 @@ export default function SquadScreen() {
             const villain = getVillainById(state.villain_id);
             if (!villain) return null;
             const hero = villain.hero;
+
             if (tab === 'villains') {
               return (
-                <View key={state.villain_id} style={styles.card}>
+                <TouchableOpacity
+                  key={state.villain_id}
+                  style={styles.card}
+                  onPress={() => navigation.navigate('VillainDetail', { villainId: state.villain_id })}
+                  activeOpacity={0.85}
+                >
                   <View style={styles.cardHeader}>
                     <Text style={styles.cardEmoji}>{villain.emoji}</Text>
                     <View>
@@ -50,27 +56,34 @@ export default function SquadScreen() {
                     </View>
                   </View>
                   <VillainHPBar hp={state.hp} />
-                </View>
-              );
-            } else {
-              return (
-                <View key={state.villain_id} style={styles.card}>
-                  <View style={styles.cardHeader}>
-                    <Text style={styles.cardEmoji}>{hero.emoji}</Text>
-                    <View>
-                      <Text style={[styles.cardName, { color: COLORS.hero }]}>{hero.name}</Text>
-                      <Text style={styles.cardDesc}>{hero.desc}</Text>
-                    </View>
-                  </View>
-                  <HeroPowerBar power={state.hero_power} />
-                  {state.hero_power >= hero.unlockPower && (
-                    <View style={styles.unlockBadge}>
-                      <Text style={styles.unlockText}>🔓 {hero.unlockReward}</Text>
-                    </View>
-                  )}
-                </View>
+                  <Text style={styles.tapHint}>Tap for stats</Text>
+                </TouchableOpacity>
               );
             }
+
+            return (
+              <TouchableOpacity
+                key={state.villain_id}
+                style={styles.card}
+                onPress={() => navigation.navigate('HeroDetail', { villainId: state.villain_id })}
+                activeOpacity={0.85}
+              >
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardEmoji}>{hero.emoji}</Text>
+                  <View>
+                    <Text style={[styles.cardName, { color: COLORS.hero }]}>{hero.name}</Text>
+                    <Text style={styles.cardDesc}>{hero.desc}</Text>
+                  </View>
+                </View>
+                <HeroPowerBar power={state.hero_power} />
+                {state.hero_power >= hero.unlockPower && (
+                  <View style={styles.unlockBadge}>
+                    <Text style={styles.unlockText}>Unlocked: {hero.unlockReward}</Text>
+                  </View>
+                )}
+                <Text style={styles.tapHint}>Tap for details</Text>
+              </TouchableOpacity>
+            );
           })}
         </View>
       </ScrollView>
@@ -94,6 +107,7 @@ const styles = StyleSheet.create({
   cardEmoji: { fontSize: 28 },
   cardName: { fontFamily: FONTS.dmSansMedium, fontSize: 17, fontWeight: '700' },
   cardDesc: { fontFamily: FONTS.dmSans, fontSize: 12, color: COLORS.textGhost, marginTop: 1 },
+  tapHint: { fontFamily: FONTS.dmMono, fontSize: 10, color: COLORS.textDeep, marginTop: 10, letterSpacing: 1 },
   unlockBadge: { marginTop: 10, backgroundColor: COLORS.heroDark, borderWidth: 1, borderColor: COLORS.heroBorder, borderRadius: 6, padding: 8 },
   unlockText: { fontFamily: FONTS.dmMono, fontSize: 10, color: COLORS.hero, letterSpacing: 1 },
 });

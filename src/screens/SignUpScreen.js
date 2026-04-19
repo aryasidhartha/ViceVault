@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { COLORS, FONTS } from '../utils/theme';
 import { PrimaryButton, GhostButton } from '../components/UIComponents';
-import { signUp } from '../utils/supabase';
+import { signUpWithEmail } from '../utils/supabase';
 
 export default function SignUpScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -13,21 +13,29 @@ export default function SignUpScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
 
   async function handleSignUp() {
-    if (!email || !password) {
-      Alert.alert('Missing info', 'Enter your email and a password.');
+    const cleanEmail = String(email || '').trim().toLowerCase();
+    if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      Alert.alert('Invalid email', 'Enter a valid email address.');
       return;
     }
-    if (password.length < 6) {
-      Alert.alert('Password too short', 'Use at least 6 characters.');
+    if (!password) {
+      Alert.alert('Missing password', 'Enter a password.');
       return;
     }
     setLoading(true);
-    const { error } = await signUp(email.trim().toLowerCase(), password);
+    const { data, error } = await signUpWithEmail(cleanEmail, password);
     setLoading(false);
     if (error) {
-      Alert.alert('Sign up failed', error.message);
-    } else {
+      console.error('Sign up failed', error);
+      Alert.alert('Sign up failed', error.message || 'Network request failed');
+      return;
+    }
+
+    if (data?.user) {
       navigation.navigate('CreateProfile');
+    } else {
+      Alert.alert('Check your email', 'A confirmation email has been sent. Confirm your account then sign in.');
+      navigation.navigate('SignIn');
     }
   }
 
@@ -45,30 +53,31 @@ export default function SignUpScreen({ navigation }) {
           </View>
 
           <View style={styles.form}>
-            <Text style={styles.label}>EMAIL</Text>
+            <Text style={styles.label}>EMAIL ADDRESS</Text>
             <TextInput
               style={styles.input}
               value={email}
               onChangeText={setEmail}
-              placeholder="you@example.com"
+              placeholder="you@domain.com"
               placeholderTextColor={COLORS.textGhost}
-              keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
+              keyboardType="email-address"
             />
-
             <Text style={styles.label}>PASSWORD</Text>
             <TextInput
               style={styles.input}
               value={password}
               onChangeText={setPassword}
-              placeholder="6+ characters"
+              placeholder="Enter a password"
               placeholderTextColor={COLORS.textGhost}
+              autoCapitalize="none"
+              autoCorrect={false}
               secureTextEntry
             />
 
             <PrimaryButton
-              title={loading ? 'Creating account...' : 'Create account →'}
+              title={loading ? 'Signing up...' : 'Create account →'}
               onPress={handleSignUp}
               style={{ marginTop: 8 }}
             />

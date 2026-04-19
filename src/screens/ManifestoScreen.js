@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, StyleSheet, SafeAreaView, Animated,
+  View, Text, StyleSheet, SafeAreaView, Animated, Alert,
 } from 'react-native';
 import { COLORS, FONTS } from '../utils/theme';
 import { PrimaryButton } from '../components/UIComponents';
@@ -40,11 +40,16 @@ function ManifestLine({ tag, text, bold, after, delay }) {
 
 export default function ManifestoScreen({ navigation }) {
   const [ctaVisible, setCtaVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setCtaVisible(true), 300 + LINES.length * 500 + 300);
     return () => clearTimeout(t);
   }, []);
+
+  function handleContinue() {
+    navigation.navigate('SignUp');
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -60,8 +65,9 @@ export default function ManifestoScreen({ navigation }) {
 
         <Animated.View style={{ opacity: ctaVisible ? 1 : 0 }}>
           <PrimaryButton
-            title="I'll be honest"
-            onPress={() => navigation.navigate('VillainPicker')}
+            title={loading ? 'Getting started...' : "I'll be honest"}
+            onPress={handleContinue}
+            disabled={loading}
           />
         </Animated.View>
       </View>

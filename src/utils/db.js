@@ -14,8 +14,7 @@ export async function getProfile(userId) {
 export async function updateProfile(userId, updates) {
   const { data, error } = await supabase
     .from('profiles')
-    .update(updates)
-    .eq('id', userId)
+    .upsert({ id: userId, ...updates }, { onConflict: 'id' })
     .select()
     .single();
   return { data, error };
@@ -108,6 +107,39 @@ export async function activateVillains(userId, villainIds) {
   const { data, error } = await supabase
     .from('villain_states')
     .upsert(rows, { onConflict: 'user_id,villain_id' });
+  return { data, error };
+}
+
+// ─── Villain Evolution (Prestige System) ──────────────────────
+
+export async function evolveVillain(userId, villainId) {
+  const { data: state } = await supabase
+    .from('villain_states')
+    .select('tier, hp')
+    .eq('user_id', userId)
+    .eq('villain_id', villainId)
+    .single();
+
+  const currentTier = state?.tier || 1;
+  const newTier = currentTier + 1;
+  const newHp = 80 + (currentTier * 40); // HP scales up with each tier
+
+  // Reward massive XP for defeating the current tier
+  await addXP(userId, currentTier * 1000);
+  await unlockAchievement(userId, `defeat_${villainId}_tier_${currentTier}`);
+
+  const { data, error } = await supabase
+    .from('villain_states')
+    .update({
+      hp: newHp,
+      hero_power: 20, // Reset hero advantage for the new fight
+      tier: newTier,
+    })
+    .eq('user_id', userId)
+    .eq('villain_id', villainId)
+    .select()
+    .single();
+
   return { data, error };
 }
 

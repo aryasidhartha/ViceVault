@@ -1,5 +1,4 @@
 import React from 'react';
-import ManifestoScreen from './src/screens/ManifestoScreen';
 import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import { COLORS, FONTS } from '../utils/theme';
 import { PrimaryButton } from '../components/UIComponents';

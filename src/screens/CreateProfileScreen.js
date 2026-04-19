@@ -24,6 +24,12 @@ export default function CreateProfileScreen({ navigation }) {
   const [whyHere, setWhyHere] = useState('');
   const [loading, setLoading] = useState(false);
 
+  if (!user) {
+    Alert.alert('Not signed in', 'Please sign in first.');
+    navigation.navigate('SignIn');
+    return null;
+  }
+
   async function handleCreate() {
     if (!username.trim()) {
       Alert.alert('Username required', 'Pick a username for your fighter card.');
@@ -52,7 +58,7 @@ export default function CreateProfileScreen({ navigation }) {
       Alert.alert('Error', error.message);
     } else {
       await refreshProfile();
-      navigation.navigate('Manifesto');
+      navigation.replace('VillainPicker');
     }
   }
 

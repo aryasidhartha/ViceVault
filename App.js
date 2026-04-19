@@ -19,6 +19,9 @@ import CheckInScreen from './src/screens/CheckInScreen';
 import WinScreen from './src/screens/WinScreen';
 import SlipScreen from './src/screens/SlipScreen';
 import MainTabs from './src/components/MainTabs';
+import HeroDetailScreen from './src/screens/HeroDetailScreen';
+import VillainDetailScreen from './src/screens/VillainDetailScreen';
+import NeuroLessonScreen from './src/screens/NeuroLessonScreen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -33,6 +36,7 @@ function RootNavigator() {
     return (
       <Stack.Navigator screenOptions={screenOpts}>
         <Stack.Screen name="Intro" component={IntroScreen} />
+        <Stack.Screen name="Manifesto" component={ManifestoScreen} />
         <Stack.Screen name="SignUp" component={SignUpScreen} />
         <Stack.Screen name="SignIn" component={SignInScreen} />
       </Stack.Navigator>
@@ -49,6 +53,9 @@ function RootNavigator() {
         <Stack.Screen name="CheckIn" component={CheckInScreen} />
         <Stack.Screen name="Win" component={WinScreen} />
         <Stack.Screen name="Slip" component={SlipScreen} />
+        <Stack.Screen name="HeroDetail" component={HeroDetailScreen} />
+        <Stack.Screen name="VillainDetail" component={VillainDetailScreen} />
+        <Stack.Screen name="NeuroLesson" component={NeuroLessonScreen} />
       </Stack.Navigator>
     );
   }
@@ -61,6 +68,9 @@ function RootNavigator() {
       <Stack.Screen name="Slip" component={SlipScreen} />
       <Stack.Screen name="VillainPicker" component={VillainPickerScreen} />
       <Stack.Screen name="Manifesto" component={ManifestoScreen} />
+      <Stack.Screen name="HeroDetail" component={HeroDetailScreen} />
+      <Stack.Screen name="VillainDetail" component={VillainDetailScreen} />
+      <Stack.Screen name="NeuroLesson" component={NeuroLessonScreen} />
     </Stack.Navigator>
   );
 }

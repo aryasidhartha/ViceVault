@@ -19,17 +19,56 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 });
 
 // ─────────────────────────────────────────────────────────────
-// Auth helpers
+// Email auth helpers
 // ─────────────────────────────────────────────────────────────
 
-export async function signUp(email, password) {
-  const { data, error } = await supabase.auth.signUp({ email, password });
-  return { data, error };
+function normalizeEmail(email) {
+  const trimmed = String(email || '').trim().toLowerCase();
+  return trimmed;
 }
 
-export async function signIn(email, password) {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  return { data, error };
+function validateEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+export async function signUpWithEmail(email, password) {
+  try {
+    const normalizedEmail = normalizeEmail(email);
+    if (!normalizedEmail || !validateEmail(normalizedEmail)) {
+      return { data: null, error: { message: 'Enter a valid email address.' } };
+    }
+    if (!password || password.length < 6) {
+      return { data: null, error: { message: 'Password must be at least 6 characters.' } };
+    }
+
+    const { data, error } = await supabase.auth.signUp({
+      email: normalizedEmail,
+      password,
+    });
+    return { data, error };
+  } catch (error) {
+    return { data: null, error };
+  }
+}
+
+export async function signInWithEmail(email, password) {
+  try {
+    const normalizedEmail = normalizeEmail(email);
+    if (!normalizedEmail || !validateEmail(normalizedEmail)) {
+      return { data: null, error: { message: 'Enter a valid email address.' } };
+    }
+    if (!password) {
+      return { data: null, error: { message: 'Enter your password.' } };
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: normalizedEmail,
+      password,
+    });
+    return { data, error };
+  } catch (error) {
+    return { data: null, error };
+  }
 }
 
 export async function signOut() {
@@ -45,4 +84,12 @@ export async function getSession() {
 export async function getCurrentUser() {
   const { data: { user } } = await supabase.auth.getUser();
   return user;
+}
+
+export async function createProfile(userId) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .insert([{ id: userId }])
+    .select();
+  return { data, error };
 }
