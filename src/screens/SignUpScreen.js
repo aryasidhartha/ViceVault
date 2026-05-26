@@ -31,7 +31,7 @@ export default function SignUpScreen({ navigation }) {
       return;
     }
 
-    if (data?.user) {
+    if (data?.session) {
       navigation.navigate('CreateProfile');
     } else {
       Alert.alert('Check your email', 'A confirmation email has been sent. Confirm your account then sign in.');

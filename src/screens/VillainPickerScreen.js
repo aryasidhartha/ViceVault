@@ -81,6 +81,13 @@ export default function VillainPickerScreen({ navigation, route }) {
           }}
         />
 
+        <TouchableOpacity 
+          style={styles.createCustomBtn} 
+          onPress={() => navigation.navigate('CreateCustomVillain')}
+        >
+           <Text style={styles.createCustomBtnText}>+ Create Custom Villain</Text>
+        </TouchableOpacity>
+
         <PrimaryButton
           title="Start fighting →"
           onPress={confirm}
@@ -109,4 +116,6 @@ const styles = StyleSheet.create({
   villainName: { fontFamily: FONTS.dmSansMedium, fontSize: 15, fontWeight: '700', color: COLORS.text, marginBottom: 2 },
   villainType: { fontFamily: FONTS.dmMono, fontSize: 10, color: COLORS.textGhost },
   check: { position: 'absolute', top: 10, right: 12, color: COLORS.accent, fontSize: 14, fontWeight: '600' },
+  createCustomBtn: { paddingVertical: 14, alignItems: 'center', marginBottom: 10 },
+  createCustomBtnText: { fontFamily: FONTS.dmSansMedium, fontSize: 14, color: COLORS.accent },
 });

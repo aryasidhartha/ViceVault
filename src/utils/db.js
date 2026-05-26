@@ -110,6 +110,33 @@ export async function activateVillains(userId, villainIds) {
   return { data, error };
 }
 
+// ─── Custom Villains ──────────────────────────────────────────
+
+export async function getCustomVillains(userId) {
+  const { data, error } = await supabase
+    .from('custom_villains')
+    .select('villain_data')
+    .eq('user_id', userId);
+    
+  if (data) {
+    return { data: data.map(row => row.villain_data), error };
+  }
+  return { data: [], error };
+}
+
+export async function createCustomVillain(userId, villainData) {
+  const { data, error } = await supabase
+    .from('custom_villains')
+    .insert({
+      user_id: userId,
+      id: villainData.id,
+      villain_data: villainData, // Stored as a JSONB payload
+    })
+    .select()
+    .single();
+  return { data, error };
+}
+
 // ─── Villain Evolution (Prestige System) ──────────────────────
 
 export async function evolveVillain(userId, villainId) {

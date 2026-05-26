@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import { COLORS, FONTS } from '../utils/theme';
-import { PrimaryButton } from '../components/UIComponents';
+import { PrimaryButton, GhostButton } from '../components/UIComponents';
 
 export default function IntroScreen({ navigation }) {
   return (
@@ -18,7 +18,14 @@ export default function IntroScreen({ navigation }) {
             Not through discipline.{'\n'}Not through guilt.{'\n'}
             <Text style={styles.statementBold}>Through honesty.</Text>
           </Text>
-          <PrimaryButton title="Let's go →" onPress={() => navigation.navigate('Manifesto')} />
+          <View>
+            <PrimaryButton title="Let's go →" onPress={() => navigation.navigate('Manifesto')} />
+            <GhostButton 
+              title="ALREADY HAVE AN ACCOUNT" 
+              onPress={() => navigation.navigate('SignIn')} 
+              style={{ marginTop: 12 }} 
+            />
+          </View>
         </View>
       </View>
     </SafeAreaView>

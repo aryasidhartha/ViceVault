@@ -1,4 +1,5 @@
 import { getVillainStates } from './db';
+import { getVillainById } from '../data/villains';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ─── Biological Dictionary for Interactive Tooltips ──────────
@@ -20,14 +21,6 @@ export const BIO_DICTIONARY = {
 // For production, it is highly recommended to move this fetch request 
 // into a Supabase Edge Function so your API key isn't exposed in the app code!
 const OPENAI_API_KEY = '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'; 
-
-// Human-readable habits for the AI Prompt
-const HABIT_MAP = {
-  scroller: 'Infinite social media scrolling and digital overstimulation',
-  caffdemon: 'Excessive caffeine dependency and energy crashes',
-  sleepthief: 'Sleep deprivation and late-night screen time',
-  snackgoblin: 'Junk food, sugar addiction, and binge eating',
-};
 
 // A robust, highly-credible offline database to fall back on
 const OFFLINE_KNOWLEDGE_BASE = {
@@ -80,7 +73,10 @@ export async function getCuratedIntel(userId, count = 5) {
     // 3. Try to generate highly-credible dynamic content using AI
     if (OPENAI_API_KEY) {
       const topics = activeIds.length > 0 
-        ? activeIds.map(id => HABIT_MAP[id] || id).join(', ')
+        ? activeIds.map(id => {
+            const v = getVillainById(id);
+            return v ? v.type : id;
+          }).join(', ')
         : 'General procrastination, bad habits, and lack of focus';
 
       const systemPrompt = `You are a neuroscientist like Andrew Huberman. Generate ${count} highly credible, scientifically accurate facts about how the following habits affect the brain: ${topics}.
@@ -120,6 +116,9 @@ export async function getCuratedIntel(userId, count = 5) {
         await AsyncStorage.setItem(memoryKey, JSON.stringify(memory));
         
         return aiFacts;
+      } else {
+        const errData = await response.text();
+        console.warn("⚠️ OpenAI API Error:", response.status, errData);
       }
     }
 

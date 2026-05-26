@@ -8,7 +8,6 @@ import { PrimaryButton } from '../components/UIComponents';
 const LINES = [
   { tag: 'The rule', text: 'Be honest. ', bold: 'Even when it\'s embarrassing.' },
   { tag: 'Why it pays', text: 'Admitting a slip ', bold: 'earns more XP than faking a win.' },
-  { tag: 'Your privacy', text: '', bold: 'Everything stays on your device.', after: ' No account. No server. Nobody watching.' },
   { tag: 'The only way to lose', text: 'Lying to yourself. ', bold: 'Not slipping - everyone slips.' },
 ];
 

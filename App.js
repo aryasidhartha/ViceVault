@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -22,6 +22,9 @@ import MainTabs from './src/components/MainTabs';
 import HeroDetailScreen from './src/screens/HeroDetailScreen';
 import VillainDetailScreen from './src/screens/VillainDetailScreen';
 import NeuroLessonScreen from './src/screens/NeuroLessonScreen';
+import CreateCustomVillainScreen from './src/screens/CreateCustomVillainScreen';
+import { getCustomVillains } from './src/utils/db';
+import { registerCustomVillains } from './src/data/villains';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -30,6 +33,15 @@ const screenOpts = { headerShown: false, cardStyle: { backgroundColor: COLORS.bg
 
 function RootNavigator() {
   const { user, profile, loading } = useAuth();
+
+  useEffect(() => {
+    if (user?.id) {
+      getCustomVillains(user.id).then(({ data }) => {
+        if (data) registerCustomVillains(data);
+      });
+    }
+  }, [user?.id]);
+
   if (loading) return null;
 
   if (!user) {
@@ -49,6 +61,7 @@ function RootNavigator() {
         <Stack.Screen name="CreateProfile" component={CreateProfileScreen} />
         <Stack.Screen name="Manifesto" component={ManifestoScreen} />
         <Stack.Screen name="VillainPicker" component={VillainPickerScreen} />
+        <Stack.Screen name="CreateCustomVillain" component={CreateCustomVillainScreen} />
         <Stack.Screen name="Main" component={MainTabs} />
         <Stack.Screen name="CheckIn" component={CheckInScreen} />
         <Stack.Screen name="Win" component={WinScreen} />
@@ -67,6 +80,7 @@ function RootNavigator() {
       <Stack.Screen name="Win" component={WinScreen} />
       <Stack.Screen name="Slip" component={SlipScreen} />
       <Stack.Screen name="VillainPicker" component={VillainPickerScreen} />
+      <Stack.Screen name="CreateCustomVillain" component={CreateCustomVillainScreen} />
       <Stack.Screen name="Manifesto" component={ManifestoScreen} />
       <Stack.Screen name="HeroDetail" component={HeroDetailScreen} />
       <Stack.Screen name="VillainDetail" component={VillainDetailScreen} />

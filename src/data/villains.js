@@ -137,10 +137,90 @@ export const VILLAINS = [
       unlockReward: 'Abundance Mode — gratitude + presence challenges',
     },
   },
+  {
+    id: 'vapeghost',
+    emoji: '💨',
+    name: 'The Vape Ghost',
+    type: 'Nicotine / Vaping addiction',
+    defaultHP: 75,
+    taunts: [
+      "Just one hit. It'll take the edge off.",
+      "I'm right here in your pocket.",
+      "You're stressed. You need me.",
+      "It's just flavored air... right?",
+    ],
+    winResponse: "Breathed real air today. The Lungs are grateful.",
+    science: "Nicotine reaches the brain in 10 seconds, causing a massive artificial dopamine spike. Your brain quickly downregulates natural dopamine production, making you dependent on the vape just to feel 'normal'.",
+    tip: "Increase friction. Put the vape in a difficult-to-reach place, like a timed lockbox or the trunk of your car.",
+    hero: {
+      emoji: '🫁',
+      name: 'The Breath',
+      desc: 'Finds calm without the cloud.',
+      unlockPower: 80,
+      unlockReward: 'Deep Breathing Protocol',
+    },
+  },
+  {
+    id: 'couchpotato',
+    emoji: '🛋️',
+    name: 'The Couch Potato',
+    type: 'Sedentary lifestyle / Skipping workouts',
+    defaultHP: 70,
+    taunts: [
+      "We can just go tomorrow. Tomorrow is better.",
+      "You've worked hard today, you deserve to sit.",
+      "Why lift heavy circles when the couch is so soft?",
+      "Just one more episode before we move.",
+    ],
+    winResponse: "Got up and moved. The Momentum builds.",
+    science: "Prolonged sitting reduces blood flow to the brain and decreases the production of BDNF (Brain-Derived Neurotrophic Factor), which is like miracle-gro for your neurons.",
+    tip: "Commit to just 5 minutes. Put on your workout clothes and do 5 minutes of anything. Often, starting is the only hard part.",
+    hero: {
+      emoji: '🏃',
+      name: 'The Momentum',
+      desc: 'An object in motion stays in motion.',
+      unlockPower: 80,
+      unlockReward: 'Endorphin Rush Mode',
+    },
+  },
+  {
+    id: 'hustledemon',
+    emoji: '💼',
+    name: 'The Hustle Demon',
+    type: 'Overworking / Burnout',
+    defaultHP: 80,
+    taunts: [
+      "If you're not grinding, you're falling behind.",
+      "Sleep is for the weak.",
+      "You can rest when you're dead.",
+      "Look at them, working harder than you.",
+    ],
+    winResponse: "Clocked out and shut down. The Balanced knows rest is productive.",
+    science: "Chronic overworking floods the brain with cortisol, leading to an enlarged amygdala and a weakened prefrontal cortex. You literally become more anxious and less capable of complex problem-solving.",
+    tip: "Schedule your rest with the same intensity as your work. Set a hard 'tools down' alarm for the evening.",
+    hero: {
+      emoji: '⚖️',
+      name: 'The Balanced',
+      desc: 'Knows that resting is a requirement, not a reward.',
+      unlockPower: 80,
+      unlockReward: 'Disconnect Challenge',
+    },
+  },
 ];
 
+// --- Custom Villain Support ---
+let customVillains = [];
+
+export function registerCustomVillains(villains) {
+  customVillains = villains;
+}
+
+export function getAllVillains() {
+  return [...VILLAINS, ...customVillains];
+}
+
 export function getVillainById(id) {
-  return VILLAINS.find(v => v.id === id);
+  return VILLAINS.find(v => v.id === id) || customVillains.find(v => v.id === id);
 }
 
 export function getHeroForVillain(villainId) {
